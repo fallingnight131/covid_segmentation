@@ -41,7 +41,7 @@ def align_labels(final_labels):
     return final_labels
 
 # 形态学去噪
-def remove_noise_morphology(labels, kernel_size=3, operation="MORPH_OPEN"):
+def remove_noise_morphology(labels, kernel_size=5, operation="MORPH_OPEN"):
     denoised_labels = []
     kernel = np.ones((kernel_size, kernel_size), np.uint8) 
     if operation == "MORPH_OPEN":

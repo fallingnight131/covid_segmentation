@@ -1,5 +1,4 @@
 import numpy as np
-from model.k_means import CustomKMeans as KMeans # 导入自定义 K-Means
 from util.data_process import preprocess# 预测 KMeans 分割
 from core.contour_detect import get_lung_contour_mask
 
@@ -10,7 +9,6 @@ def images_kmeans_predict(images, k_means):
     all_features = []  # 存储所有图像的特征
 
     start_idx = 0
-    
     
     # 1. 遍历所有图片，提取特征
     for img in images:
