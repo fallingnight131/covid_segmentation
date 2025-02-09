@@ -2,7 +2,6 @@ import numpy as np
 from util.data_process import preprocess# 预测 KMeans 分割
 from core.contour_detect import get_lung_contour_mask
 
-
 def images_kmeans_predict(images, k_means):
     final_labels = []
     image_shapes = []

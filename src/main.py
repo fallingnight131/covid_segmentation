@@ -7,7 +7,7 @@ from core.predict import images_kmeans_predict
 
 # 获取当前脚本的目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
-file_path = os.path.join(current_dir, 'data', 'images_radiopedia.npy')
+file_path = os.path.join(current_dir, '../data', 'images_radiopedia.npy')
 
 # 检查文件是否存在
 if not os.path.exists(file_path):
