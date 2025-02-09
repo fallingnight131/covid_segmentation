@@ -2,7 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from util.data_process import  normalize_ct , align_labels, remove_noise_morphology, remove_noise_connected_components
-from core.train import images_kmeans
+from core.train import images_kmeans_train
+from core.predict import images_kmeans_predict
 
 # 获取当前脚本的目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -20,7 +21,10 @@ images = normalize_ct(images)
 images = images.squeeze()  
 
 # 对图像进行 KMeans 聚类
-labels, image_shapes = images_kmeans(images, k1=2)
+kmeans_model = images_kmeans_train(images, k1=2)
+
+# 预测图像的分割结果
+labels = images_kmeans_predict(images, kmeans_model)
 
 # 统一标签，防止颜色翻转
 final_labels = align_labels(labels)
