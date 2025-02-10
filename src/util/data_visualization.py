@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def display_images_paginated(images_test, test_masks, labels_denoised, images_per_page=10):
+def display_images_paginated(images_test, test_masks, 
+                             labels_denoised, images_per_page=10):
     """
     分页显示原始图像、真实掩码和预测掩码。
     

@@ -38,24 +38,24 @@ use_existing_model = True   # 可以自行更改，True 表示使用已有模型
 if not (use_existing_model and os.path.exists(model_path)):
     print("Training KMeans model...")
     # 对图像进行 KMeans 聚类
-    images_kmeans_train(images_train, k1=2, batch_size=512*512*100, 
-                                    max_iter=100, tol=1e-4, random_state=42, 
-                                    model_path=model_path)
+    images_kmeans_train(images=images_train, k1=2, batch_size=512*512*100, 
+                        max_iter=100, tol=1e-4, random_state=42, 
+                        model_path=model_path)
 else:
     print("Using existing model...")
     
 # 预测图像的分割结果
-labels = images_kmeans_predict(images_test, model_path=model_path)
+predict_labels = images_kmeans_predict(images_test, model_path=model_path)
 
 # 统一标签，防止颜色翻转
-final_labels = align_labels(labels)
+predict_labels = align_labels(predict_labels)
 
-# 1. 形态学开运算去噪
-labels_denoised = remove_noise_morphology(final_labels, operation="MORPH_CLOSE", kernel_size=3)
-labels_denoised = remove_noise_morphology(labels_denoised, operation="MORPH_OPEN", kernel_size=3)
+# 形态学开运算去噪
+predict_labels = remove_noise_morphology(predict_labels, operation="MORPH_CLOSE", kernel_size=3)
+predict_labels = remove_noise_morphology(predict_labels, operation="MORPH_OPEN", kernel_size=3)
 
-# 2. 连通区域分析去小噪声
-labels_denoised = remove_noise_connected_components(labels_denoised, min_size=500)
+# 连通区域分析去小噪声
+predict_labels = remove_noise_connected_components(predict_labels, min_size=500)
 
 # 分页显示结果
-display_images_paginated(images_test, test_masks, labels_denoised, images_per_page=7)
+display_images_paginated(images_test, test_masks, predict_labels, images_per_page=7)

@@ -9,6 +9,19 @@ from core.contour_detect import get_lung_contour_mask
 def images_kmeans_train(images, k1=2, batch_size=512*512*100, 
                         max_iter=100, tol=1e-4, random_state=42,
                         model_path="model/kmeans_model.pkl"):
+    """
+    对图像进行 KMeans 聚类
+    
+    :param images: 图像数据，形状为 (N, H, W) 或 (N, H, W, C)
+    :param k1: 聚类数 (默认为2)
+    :param batch_size: 批处理大小 (默认为 512*512*100)
+    :param max_iter: 最大迭代次数 (默认为100)
+    :param tol: 容忍度 (默认为1e-4)
+    :param random_state: 随机种子 (默认为42)
+    :param model_path: 保存模型的路径 (默认为 "model/kmeans_model.pkl")
+    
+    :return: 训练好的 KMeans 模型
+    """
     all_features = []  # 用于存储所有图像的像素特征
 
     # 1. 遍历所有图片，提取特征

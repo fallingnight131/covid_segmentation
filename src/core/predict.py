@@ -4,6 +4,15 @@ from util.data_process import preprocess# 预测 KMeans 分割
 from core.contour_detect import get_lung_contour_mask
 
 def images_kmeans_predict(images, k_means=None, model_path="model/kmeans_model.pkl"):
+    """
+    预测图像的分割结果
+    
+    :param images: np.ndarray, shape=(N, H, W), N 为图像数量，H 为高度，W 为宽度
+    :param k_means: KMeans, KMeans 模型
+    :param model_path: str, KMeans 模型路径
+    
+    :return: list, 预测的分割结果，每个元素为一个图像的标签，shape=(H, W)
+    """
     final_labels = []
     image_shapes = []
     all_features = []  # 存储所有图像的特征

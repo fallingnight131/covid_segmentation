@@ -3,9 +3,11 @@ import numpy as np
 
 def get_lung_contour_mask(image):
     """
-    输入：肺部 CT / X-ray 图像，输出整个胸腔内的二值掩码
-    :param image: 输入的肺部图像 (numpy 数组，单通道或三通道)
-    :return: 二值掩码 (numpy 数组)，1 表示胸腔内部区域，-1 表示背景
+    获取胸腔的轮廓掩码
+    
+    :param image: 输入图像，可以是灰度图或三通道图像
+    
+    :return: 胸腔的轮廓掩码，1 代表胸腔内区域，-1 代表背景
     """
     # 1. 预处理：转换为灰度图
     if len(image.shape) == 3:  # 如果是三通道图像
