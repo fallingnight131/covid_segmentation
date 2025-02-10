@@ -21,7 +21,7 @@ class CustomKMeans:
     centers: ndarray, shape (k, n_features), 簇中心
     labels: ndarray, shape (n_samples,), 样本的标签
     """
-    def __init__(self, k, max_iter=1000, tol=1e-4, random_state=42, verbose=True):
+    def __init__(self, k, max_iter=500, tol=1e-4, random_state=42, verbose=True):
         self.k = k
         self.max_iter = max_iter
         self.tol = tol
@@ -59,7 +59,7 @@ class CustomKMeans:
             if np.all(np.abs(new_centers - self.centers) < self.tol):
                 break
             
-            if i / 50 == 0:
+            if self.verbose and i % 10 == 0
                 logging.info(f"已训练第 {i + 1} 轮")
                 logging.info(f"当前中心更新量: {np.sum(np.abs(new_centers - self.centers)):.4f}")
                 
@@ -113,7 +113,7 @@ class MiniBatchKMeans:
     centers: ndarray, shape (k, n_features), 簇中心
     labels: ndarray, shape (n_samples,), 样本的标签
     """
-    def __init__(self, k, batch_size=1000, max_iter=1000, tol=1e-4, random_state=42, verbose=True):
+    def __init__(self, k, batch_size=1000, max_iter=500, tol=1e-4, random_state=42, verbose=True):
         self.k = k
         self.batch_size = batch_size  # 每次只用 batch_size 个样本更新中心
         self.max_iter = max_iter
@@ -159,7 +159,7 @@ class MiniBatchKMeans:
             if np.all(np.abs(new_centers - self.centers) < self.tol):
                 break
 
-            if self.verbose and i % 50 == 0:
+            if self.verbose and i % 10 == 0:
                 logging.info(f"已训练第 {i + 1} 轮")
                 logging.info(f"当前中心更新量: {np.sum(np.abs(new_centers - self.centers)):.4f}")
                 

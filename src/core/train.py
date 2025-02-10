@@ -7,7 +7,7 @@ from core.contour_detect import get_lung_contour_mask
 
 # 对图片的 KMeans 聚类 (仅使用灰度值)
 def images_kmeans_train(images, k1=2, batch_size=512*512*100, 
-                        max_iter=100, tol=1e-4, random_state=42,
+                        max_iter=500, tol=1e-4, random_state=42,
                         verbose=True, model_path="model/kmeans_model.pkl"):
     """
     对图像进行 KMeans 聚类
