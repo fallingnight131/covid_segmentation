@@ -40,7 +40,7 @@ use_existing_model = True   # 可以自行更改，True 表示使用已有模型
 if not (use_existing_model and os.path.exists(model_path)):
     print("Training KMeans model...")
     # 对图像进行 KMeans 聚类
-    images_kmeans_train(images=images_train, k1=2, batch_size=512*512*100, 
+    images_kmeans_train(images=images_train, k1=2, batch_size=1000, 
                         max_iter=500, tol=1e-4, random_state=42, 
                         verbose=True, model_path=model_path)
 else:
