@@ -37,7 +37,7 @@ class CustomKMeans:
             self.centers = new_centers
         
         end_time = time.time()
-        # print(f"Optimized K-means execution time: {end_time - start_time:.2f} seconds")
+        print(f"Optimized K-means execution time: {end_time - start_time:.2f} seconds")
     
     def predict(self, X):
         X_squared = np.sum(X**2, axis=1).reshape(-1, 1)
@@ -66,6 +66,7 @@ class MiniBatchKMeans:
         self.labels = None
     
     def fit(self, X):
+        start_time = time.time()  # 记录算法开始时间
         np.random.seed(self.random_state)
         self.centers = self._initialize_centers(X)
         n_samples = X.shape[0]
@@ -94,6 +95,9 @@ class MiniBatchKMeans:
                 break
 
             self.centers = new_centers
+            
+        end_time = time.time()  # 记录算法结束时间
+        print(f"Optimized K-means execution time: {end_time - start_time:.2f} seconds")  # 打印算法执行时间
 
     def predict(self, X):
         X_squared = np.sum(X**2, axis=1).reshape(-1, 1)

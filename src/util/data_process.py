@@ -40,6 +40,43 @@ def align_labels(final_labels):
 
     return final_labels
 
+# 自动转换 mask 类型
+def convert_mask_auto(mask):
+
+    shape = mask.shape
+    
+    # 判断输入是否为 (N, H, W)
+    if len(shape) == 3:
+        N, H, W = shape
+        new_mask = np.zeros((N, H, W, 4), dtype=np.uint8)
+
+        # 假设 mask 只有前景 (1) 和背景 (0)，填充前三个通道为前景
+        new_mask[..., 0] = (mask == 1)  # 第一个通道：类别 1
+        new_mask[..., 1] = (mask == 1)  # 第二个通道：类别 2
+        new_mask[..., 2] = (mask == 1)  # 第三个通道：类别 3
+        new_mask[..., 3] = (mask == 0)  # 第四个通道：背景 (1 代表背景)
+
+        # 将背景设为 1，前景设为 0
+        new_mask = 1 - new_mask
+
+        return new_mask
+    
+    # 判断输入是否为 (N, H, W, 4)
+    elif len(shape) == 4 and shape[-1] == 4:
+        # 取前三个通道的最大值，判断是否有前景
+        foreground = np.max(mask[..., :3], axis=-1)  # (N, H, W)
+
+        # 背景通道
+        background = mask[..., 3]  # (N, H, W)
+
+        # 生成二值 mask：前景为 0，背景为 1
+        binary_mask = np.where(background, 1, 0).astype(np.uint8)
+
+        return binary_mask
+
+    else:
+        raise ValueError("输入 mask 形状必须是 (N, H, W) 或 (N, H, W, 4)！")
+    
 # 形态学去噪
 def remove_noise_morphology(labels, kernel_size=5, operation="MORPH_OPEN"):
     denoised_labels = []

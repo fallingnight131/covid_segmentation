@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from util.data_process import  normalize_ct , align_labels, remove_noise_morphology, remove_noise_connected_components
+from util.data_process import  normalize_ct , align_labels, remove_noise_morphology, remove_noise_connected_components, convert_mask_auto
 from core.train import images_kmeans_train
 from core.predict import images_kmeans_predict
 
@@ -13,7 +13,7 @@ test_mask_path = os.path.join(current_dir, '../data/split', 'test_masks.npy')
 model_path = os.path.join(current_dir, '../model/', 'kmeans_model.pkl')
 
 # 加载图像数据
-num_images_to_process = 50 
+num_images_to_process = 50
 start_num = 0
 images_train = np.load(train_image_path)[start_num : start_num + num_images_to_process]  
 images_train = normalize_ct(images_train)
@@ -23,8 +23,12 @@ images_test = np.load(test_image_path)
 images_test = normalize_ct(images_test)
 images_test = images_test.squeeze()
 
+# 加载测试集的 mask
+test_masks = np.load(test_mask_path)
+test_masks = convert_mask_auto(test_masks)
+
 # 是否优先使用已有模型
-use_existing_model = True
+use_existing_model = False   # 可以自行更改，True 表示使用已有模型，False 表示重新训练模型
 if not (use_existing_model and os.path.exists(model_path)):
     print("Training KMeans model...")
     # 对图像进行 KMeans 聚类
@@ -47,26 +51,31 @@ labels_denoised = remove_noise_morphology(labels_denoised, operation="MORPH_OPEN
 # 2. 连通区域分析去小噪声
 labels_denoised = remove_noise_connected_components(labels_denoised, min_size=500)
 
-# 查看最终结果
+# ============= **分页显示结果** =============
+images_per_page = 10  # 每页显示 10 张
 num_images = len(labels_denoised)
-half_num_images = num_images // 2  # 分成两部分
+num_pages = int(np.ceil(num_images / images_per_page))  # 计算总页数
 
-# 第一部分
-plt.figure(figsize=(15, 15))
-for i, color_segmented in enumerate(labels_denoised[:half_num_images]):
-    grid_size = int(np.ceil(np.sqrt(half_num_images)))  # 动态计算网格大小
-    plt.subplot(grid_size, grid_size, i + 1)
-    plt.imshow(color_segmented, vmin=0, vmax=1)
-    plt.title(f'Image {i+1} Segmentation')
-    plt.axis('off')
-plt.show()
+for page in range(num_pages):
+    start_idx = page * images_per_page
+    end_idx = min(start_idx + images_per_page, num_images)
+    
+    plt.figure(figsize=(15, 5 * (end_idx - start_idx)))  # 调整图像大小
+    for i, idx in enumerate(range(start_idx, end_idx)):
+        plt.subplot(end_idx - start_idx, 3, i * 3 + 1)
+        plt.imshow(images_test[idx], cmap='gray')
+        plt.title(f'Original Image {idx+1}')
+        plt.axis('off')
 
-# 第二部分
-plt.figure(figsize=(15, 15))
-for i, color_segmented in enumerate(labels_denoised[half_num_images:]):
-    grid_size = int(np.ceil(np.sqrt(num_images - half_num_images)))  # 动态计算网格大小
-    plt.subplot(grid_size, grid_size, i + 1)
-    plt.imshow(color_segmented, vmin=0, vmax=1)
-    plt.title(f'Image {half_num_images + i + 1} Segmentation')
-    plt.axis('off')
-plt.show()
+        plt.subplot(end_idx - start_idx, 3, i * 3 + 2)
+        plt.imshow(test_masks[idx], vmin=0, vmax=1)
+        plt.title(f'Ground Truth Mask {idx+1}')
+        plt.axis('off')
+
+        plt.subplot(end_idx - start_idx, 3, i * 3 + 3)
+        plt.imshow(labels_denoised[idx], vmin=0, vmax=1)
+        plt.title(f'Predicted Mask {idx+1}')
+        plt.axis('off')
+
+    plt.tight_layout()
+    plt.show()
