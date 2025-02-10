@@ -5,9 +5,17 @@ from sklearn.model_selection import train_test_split
 # 获取当前脚本的目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
+# 如果路径不存在，则创建data/origin目录
+if not os.path.exists(os.path.join(current_dir, '../data/origin')):
+    os.makedirs(os.path.join(current_dir, '../data/origin'), exist_ok=True)
+
 # 数据路径
 image_file_path = os.path.join(current_dir, '../data/origin', 'images_radiopedia.npy')
 mask_file_path = os.path.join(current_dir, '../data/origin', 'masks_radiopedia.npy')
+
+# 检测路径是否存在
+assert os.path.exists(image_file_path), "图片数据不存在，请将images_radiopedia.npy放入data/origin目录！"
+assert os.path.exists(mask_file_path), "掩码数据不存在，请将masks_radiopedia.npy放入data/origin目录！"
 
 # 加载数据
 images = np.load(image_file_path)  # shape: (829, ...)
