@@ -61,7 +61,7 @@ class CustomKMeans:
             if center_shift < self.tol:
                 break
 
-            if self.verbose and i % 10 == 0:
+            if self.verbose:
                 logging.info(f"已训练第 {i + 1} 轮，当前中心更新量: {center_shift:.4f}")
                 
             self.centers = new_centers
@@ -161,7 +161,7 @@ class MiniBatchKMeans:
             if center_shift < self.tol:
                 break
 
-            if self.verbose and i % 10 == 0:
+            if self.verbose:
                 logging.info(f"已训练第 {i + 1} 轮，当前中心更新量: {center_shift:.4f}")
                 
             self.centers = new_centers
