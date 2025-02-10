@@ -56,12 +56,13 @@ class CustomKMeans:
             cluster_counts = sparse_matrix.sum(axis=0).A1
             new_centers = cluster_sums / cluster_counts[:, np.newaxis]
             
-            if np.all(np.abs(new_centers - self.centers) < self.tol):
+            # 计算更新量
+            center_shift = np.sum(np.abs(new_centers - self.centers))
+            if center_shift < self.tol:
                 break
-            
+
             if self.verbose and i % 10 == 0:
-                logging.info(f"已训练第 {i + 1} 轮")
-                logging.info(f"当前中心更新量: {np.sum(np.abs(new_centers - self.centers)):.4f}")
+                logging.info(f"已训练第 {i + 1} 轮，当前中心更新量: {center_shift:.4f}")
                 
             self.centers = new_centers
             
@@ -156,12 +157,12 @@ class MiniBatchKMeans:
             new_centers = cluster_sums / cluster_counts[:, np.newaxis]
 
             # 计算更新量
-            if np.all(np.abs(new_centers - self.centers) < self.tol):
+            center_shift = np.sum(np.abs(new_centers - self.centers))
+            if center_shift < self.tol:
                 break
 
             if self.verbose and i % 10 == 0:
-                logging.info(f"已训练第 {i + 1} 轮")
-                logging.info(f"当前中心更新量: {np.sum(np.abs(new_centers - self.centers)):.4f}")
+                logging.info(f"已训练第 {i + 1} 轮，当前中心更新量: {center_shift:.4f}")
                 
             self.centers = new_centers
             
