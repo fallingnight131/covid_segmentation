@@ -1,13 +1,27 @@
 import numpy as np
 import cv2
 
-# 预处理：归一化图像
 def preprocess(img):
+    """
+    图像预处理：归一化和标准化。
+    
+    :param img: 输入图像
+    
+    :return: 预处理后的图像
+    """
     img = img / 255.0  # 归一化到 [0, 1]
     return (img - img.mean()) / (img.std() + 1e-8)  # 标准化
 
-# 归一化 CT 图像到 0-255 
 def normalize_ct(image, window_width=1500, window_level=-600):
+    """
+    归一化 CT 图像到 0-255。
+    
+    :param image: 输入图像
+    :param window_width: 窗口宽度
+    :param window_level: 窗口层次
+    
+    :return: 归一化后的图像
+    """
     min_hu = window_level - (window_width / 2)
     max_hu = window_level + (window_width / 2)
     
@@ -15,13 +29,24 @@ def normalize_ct(image, window_width=1500, window_level=-600):
     image = (image - min_hu) / (max_hu - min_hu) * 255  # 归一化到 0-255
     return image.astype(np.uint8)  # 转换为 uint8 以适应 OpenCV
 
-# 对所有输入的二值图像进行黑白翻转（0变255，255变0）。
 def invert_binary_images(images):
+    """
+    对所有输入的二值图像进行黑白翻转（0 变 255，255 变 0）。
+    
+    :param images: 输入图像列表
+    
+    :return: 翻转后的图像列表
+    """
     return [255 - img for img in images]
 
-# 统一标签，防止颜色翻转
 def align_labels(final_labels):
+    """
+    统一标签，防止颜色翻转。
     
+    :param final_labels: 输入的标签列表
+    
+    :return: 统一后的标签列表
+    """
     # 计算第一张图像的背景比例（0 的比例）
     first_label = final_labels[0]
     bg_ratio = np.mean(first_label == 1)  # 计算背景的像素比例
@@ -40,9 +65,14 @@ def align_labels(final_labels):
 
     return final_labels
 
-# 自动转换 mask 类型
 def convert_mask_auto(mask):
-
+    """
+    将 mask 在单通道掩码和四通道掩码之间转换。
+    
+    :param mask: 输入 mask，形状为 (N, H, W) 或 (N, H, W, 4)
+    
+    :return: 二值掩码，形状为 (N, H, W) 或 (N, H, W, 4)
+    """
     shape = mask.shape
     
     # 判断输入是否为 (N, H, W)
@@ -77,8 +107,16 @@ def convert_mask_auto(mask):
     else:
         raise ValueError("输入 mask 形状必须是 (N, H, W) 或 (N, H, W, 4)！")
     
-# 形态学去噪
 def remove_noise_morphology(labels, kernel_size=5, operation="MORPH_OPEN"):
+    """
+    使用形态学操作去除标签中的噪声。
+    
+    :param labels: 输入的标签列表
+    :param kernel_size: 形态学核大小
+    :param operation: 形态学操作，"MORPH_OPEN" 或 "MORPH_CLOSE"
+    
+    :return: 去噪后的标签列表
+    """
     denoised_labels = []
     kernel = np.ones((kernel_size, kernel_size), np.uint8) 
     if operation == "MORPH_OPEN":
@@ -89,8 +127,15 @@ def remove_noise_morphology(labels, kernel_size=5, operation="MORPH_OPEN"):
         raise ValueError(f"Unsupported morphological operation: {operation}")
     return denoised_labels
 
-# 连通区域分析去小噪声
 def remove_noise_connected_components(labels, min_size=500):
+    """
+    使用连通区域分析去除标签中的噪声。
+    
+    :param labels: 输入的标签列表
+    :param min_size: 最小区域面积
+    
+    :return: 去噪后的标签列表
+    """
     denoised_labels = []
     for label in labels:
         num_labels, components, stats, _ = cv2.connectedComponentsWithStats(label.astype(np.uint8))
