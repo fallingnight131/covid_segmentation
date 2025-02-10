@@ -2,6 +2,7 @@ import numpy as np
 import os
 from core.train import images_kmeans_train
 from core.predict import images_kmeans_predict
+from core.eval import compute_iou
 from util.data_visualization import display_images_paginated
 from util.data_process import (
     normalize_ct,
@@ -16,6 +17,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 train_image_path = os.path.join(current_dir, '../data/split', 'train_images.npy')
 test_image_path = os.path.join(current_dir, '../data/split', 'test_images.npy')
 test_mask_path = os.path.join(current_dir, '../data/split', 'test_masks.npy')
+predict_mask_path = os.path.join(current_dir, '../data/submit', 'predict_masks.npy')
 model_path = os.path.join(current_dir, '../model/', 'kmeans_model.pkl')
 
 # 加载图像数据
@@ -31,7 +33,7 @@ images_test = images_test.squeeze()
 
 # 加载测试集的 mask
 test_masks = np.load(test_mask_path)
-test_masks = convert_mask_auto(test_masks)
+test_labels = convert_mask_auto(test_masks)
 
 # 是否优先使用已有模型
 use_existing_model = True   # 可以自行更改，True 表示使用已有模型，False 表示重新训练模型
@@ -57,5 +59,16 @@ predict_labels = remove_noise_morphology(predict_labels, operation="MORPH_OPEN",
 # 连通区域分析去小噪声
 predict_labels = remove_noise_connected_components(predict_labels, min_size=500)
 
+# 计算 IoU 指数
+iou_scores = compute_iou(test_labels, predict_labels)
+print("IoU 指数: ", iou_scores)
+
+# 保存预测结果
+if not os.path.exists(os.path.dirname(predict_mask_path)):
+    os.makedirs(os.path.dirname(predict_mask_path))
+    
+predict_masks = convert_mask_auto(predict_labels)
+np.save(predict_mask_path, predict_masks)
+
 # 分页显示结果
-display_images_paginated(images_test, test_masks, predict_labels, images_per_page=7)
+display_images_paginated(images_test, test_labels, predict_labels, images_per_page=7)
