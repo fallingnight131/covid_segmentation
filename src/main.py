@@ -21,7 +21,7 @@ predict_mask_path = os.path.join(current_dir, '../data/submit', 'predict_masks.n
 model_path = os.path.join(current_dir, '../model/', 'kmeans_model.pkl')
 
 # 加载图像数据
-num_images_to_process = 50
+num_images_to_process = 746
 start_num = 0
 images_train = np.load(train_image_path)[start_num : start_num + num_images_to_process]  
 images_train = normalize_ct(images_train)
@@ -42,7 +42,7 @@ if not (use_existing_model and os.path.exists(model_path)):
     # 对图像进行 KMeans 聚类
     images_kmeans_train(images=images_train, k1=2, batch_size=512*512*100, 
                         max_iter=100, tol=1e-4, random_state=42, 
-                        model_path=model_path)
+                        verbose=True, model_path=model_path)
 else:
     print("Using existing model...")
     
