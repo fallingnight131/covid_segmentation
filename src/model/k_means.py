@@ -1,7 +1,11 @@
 import numpy as np
 import time
+import logging
 from scipy.spatial.distance import cdist  # 用于计算样本点与簇中心之间的欧氏距离
 from scipy.sparse import coo_matrix  # 用于创建稀疏矩阵以优化簇中心的更新过程
+
+# 设置日志
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 class CustomKMeans:
     """
@@ -17,11 +21,12 @@ class CustomKMeans:
     centers: ndarray, shape (k, n_features), 簇中心
     labels: ndarray, shape (n_samples,), 样本的标签
     """
-    def __init__(self, k, max_iter=100, tol=1e-4, random_state=42):
+    def __init__(self, k, max_iter=1000, tol=1e-4, random_state=42, verbose=True):
         self.k = k
         self.max_iter = max_iter
         self.tol = tol
         self.random_state = random_state
+        self.verbose = verbose  # 控制是否打印信息
         self.centers = None
         self.labels = None
     
@@ -38,7 +43,7 @@ class CustomKMeans:
         
         self.centers = self._initialize_centers(X)
         
-        for _ in range(self.max_iter):
+        for i in range(self.max_iter):
             X_squared = np.sum(X**2, axis=1).reshape(-1, 1)
             centers_squared = np.sum(self.centers**2, axis=1).reshape(1, -1)
             distances = X_squared + centers_squared - 2 * np.dot(X, self.centers.T)
@@ -54,10 +59,14 @@ class CustomKMeans:
             if np.all(np.abs(new_centers - self.centers) < self.tol):
                 break
             
+            if i / 50 == 0:
+                logging.info(f"已训练第 {i + 1} 轮")
+                logging.info(f"当前中心更新量: {np.sum(np.abs(new_centers - self.centers)):.4f}")
+                
             self.centers = new_centers
-        
+            
         end_time = time.time()
-        print(f"Optimized K-means execution time: {end_time - start_time:.2f} seconds")
+        logging.info(f"K-means 训练总用时: {end_time - start_time:.2f} 秒")
     
     def predict(self, X):
         """
@@ -104,12 +113,13 @@ class MiniBatchKMeans:
     centers: ndarray, shape (k, n_features), 簇中心
     labels: ndarray, shape (n_samples,), 样本的标签
     """
-    def __init__(self, k, batch_size=1000, max_iter=1000, tol=1e-4, random_state=42):
+    def __init__(self, k, batch_size=1000, max_iter=1000, tol=1e-4, random_state=42, verbose=True):
         self.k = k
         self.batch_size = batch_size  # 每次只用 batch_size 个样本更新中心
         self.max_iter = max_iter
         self.tol = tol
         self.random_state = random_state
+        self.verbose = verbose
         self.centers = None
         self.labels = None
     
@@ -126,7 +136,7 @@ class MiniBatchKMeans:
         self.centers = self._initialize_centers(X)
         n_samples = X.shape[0]
 
-        for _ in range(self.max_iter):
+        for i in range(self.max_iter):
             # **随机采样 batch_size 个数据点**
             batch_indices = np.random.choice(n_samples, self.batch_size, replace=False)
             X_batch = X[batch_indices]
@@ -149,10 +159,14 @@ class MiniBatchKMeans:
             if np.all(np.abs(new_centers - self.centers) < self.tol):
                 break
 
+            if self.verbose and i % 50 == 0:
+                logging.info(f"已训练第 {i + 1} 轮")
+                logging.info(f"当前中心更新量: {np.sum(np.abs(new_centers - self.centers)):.4f}")
+                
             self.centers = new_centers
             
         end_time = time.time()  # 记录算法结束时间
-        print(f"Optimized K-means execution time: {end_time - start_time:.2f} seconds")  # 打印算法执行时间
+        logging.info(f"K-means 训练总用时: {end_time - start_time:.2f} 秒")
 
     def predict(self, X):
         """
