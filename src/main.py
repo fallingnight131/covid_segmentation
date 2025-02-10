@@ -23,11 +23,17 @@ images_test = np.load(test_image_path)
 images_test = normalize_ct(images_test)
 images_test = images_test.squeeze()
 
-# 对图像进行 KMeans 聚类
-images_kmeans_train(images_train, k1=2, batch_size=512*512*100, 
-                                   max_iter=100, tol=1e-4, random_state=42, 
-                                   model_path=model_path)
-
+# 是否优先使用已有模型
+use_existing_model = True
+if not (use_existing_model and os.path.exists(model_path)):
+    print("Training KMeans model...")
+    # 对图像进行 KMeans 聚类
+    images_kmeans_train(images_train, k1=2, batch_size=512*512*100, 
+                                    max_iter=100, tol=1e-4, random_state=42, 
+                                    model_path=model_path)
+else:
+    print("Using existing model...")
+    
 # 预测图像的分割结果
 labels = images_kmeans_predict(images_test, model_path=model_path)
 
