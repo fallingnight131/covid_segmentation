@@ -1,8 +1,9 @@
 import numpy as np
+import pickle
 from util.data_process import preprocess# 预测 KMeans 分割
 from core.contour_detect import get_lung_contour_mask
 
-def images_kmeans_predict(images, k_means):
+def images_kmeans_predict(images, k_means=None, model_path="model/kmeans_model.pkl"):
     final_labels = []
     image_shapes = []
     all_features = []  # 存储所有图像的特征
@@ -25,6 +26,11 @@ def images_kmeans_predict(images, k_means):
         all_features.append(sub)
 
         image_shapes.append(img_processed.shape[:2])  # 记录原始图像尺寸
+
+    # 如果没有传入 KMeans 模型，则加载模型
+    if k_means is None:
+        with open(model_path, "rb") as f:
+            k_means = pickle.load(f)
 
     # 2. 预测 KMeans
     all_features = np.vstack(all_features)

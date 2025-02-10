@@ -3,3 +3,5 @@ __pycache__/
 cache/
 test/
 data/
+model/
+!src/model/

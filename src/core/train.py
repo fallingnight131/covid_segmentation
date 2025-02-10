@@ -1,10 +1,14 @@
 import numpy as np
+import pickle
+import os
 from model.k_means import MiniBatchKMeans as KMeans # 导入自定义 K-Means
 from util.data_process import preprocess
 from core.contour_detect import get_lung_contour_mask
 
 # 对图片的 KMeans 聚类 (仅使用灰度值)
-def images_kmeans_train(images, k1=2, batch_size=512*512*100, max_iter=100, tol=1e-4, random_state=42):
+def images_kmeans_train(images, k1=2, batch_size=512*512*100, 
+                        max_iter=100, tol=1e-4, random_state=42,
+                        model_path="model/kmeans_model.pkl"):
     all_features = []  # 用于存储所有图像的像素特征
 
     # 1. 遍历所有图片，提取特征
@@ -33,5 +37,12 @@ def images_kmeans_train(images, k1=2, batch_size=512*512*100, max_iter=100, tol=
     # 训练 KMeans（使用全局数据）
     k_means = KMeans(k=k1, batch_size=batch_size, max_iter=max_iter, tol=tol, random_state=random_state)
     k_means.fit(all_features)
+    
+    # 保存 KMeans 模型
+    if not os.path.exists(os.path.dirname(model_path)):
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
+        
+    with open(model_path, "wb") as f:
+        pickle.dump(k_means, f)
 
     return k_means  # 返回训练好的 KMeans 模型
