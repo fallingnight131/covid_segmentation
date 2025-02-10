@@ -59,7 +59,7 @@ class CustomKMeans:
             if np.all(np.abs(new_centers - self.centers) < self.tol):
                 break
             
-            if self.verbose and i % 10 == 0
+            if self.verbose and i % 10 == 0:
                 logging.info(f"已训练第 {i + 1} 轮")
                 logging.info(f"当前中心更新量: {np.sum(np.abs(new_centers - self.centers)):.4f}")
                 
