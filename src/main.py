@@ -14,9 +14,9 @@ from util.data_process import (
 
 # 获取当前脚本的目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
-train_image_path = os.path.join(current_dir, '../data/split', 'train_images.npy')
-test_image_path = os.path.join(current_dir, '../data/split', 'test_images.npy')
-test_mask_path = os.path.join(current_dir, '../data/split', 'test_masks.npy')
+train_image_path = os.path.join(current_dir, '../data/train', 'train_images.npy')
+test_image_path = os.path.join(current_dir, '../data/test', 'test_images.npy')
+test_mask_path = os.path.join(current_dir, '../data/test', 'test_masks.npy')
 predict_mask_path = os.path.join(current_dir, '../data/submit', 'predict_masks.npy')
 model_path = os.path.join(current_dir, '../model/', 'kmeans_model.pkl')
 
